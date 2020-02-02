@@ -34,9 +34,16 @@ function prep_repos()
 	do
 		basename=$(basename $i)
 		repo_name=${basename%.*}
-		echo "\e[32m>>installing ${repo_name}"
-		mkdir /opt/$repo_name
-		git clone -q $i /opt/
+
+	if [ -d "/opt/$repo_name" ]; then
+   echo "${repo_name} already exists."
+
+	else
+		echo "\e[32m >>installing ${repo_name}"
+		#mkdir /opt/$repo_name
+		git clone -q $i /opt/$repo_name
+		echo "Installed $repo_name successfully!"
+	fi
 	done
 }
 
@@ -73,6 +80,16 @@ function update_apt ()
 	done
 }
 
+function prep_shell_env()
+{
+	echo "Preparing ZSH-Shell environment"
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+	echo "Changing shell to ZSH"
+	chsh -s /bin/zsh
+	echo "IMPLEMENT: Copy custom config file from GITHUB repo"
+}
+
 function do_misc ()
 {
 	echo "Executing misc"
@@ -80,13 +97,16 @@ function do_misc ()
 	rmdir rmdir ~/Documents/ ~/Downloads/ ~/Music/ ~/Pictures/ ~/Public/ ~/Videos/ ~/Templates/
 
 	echo "Adding system links from shared folder in the home directory"
-	ln -s /mnt/hgfs/Hacking/vh vh
-	ln -s /mnt/hgfs/Hacking/htb htb
-	ln -s /mnt/hgfs/Hacking/OverTheWire overTheWire
-	ln -s /mnt/hgfs/Hacking/CTFs/PicoCTF19 pico19
+	ln -s /mnt/hgfs/Hacking/vh ~/vh
+	ln -s /mnt/hgfs/Hacking/htb ~/htb
+	ln -s /mnt/hgfs/Hacking/OverTheWire ~/overTheWire
+	ln -s /mnt/hgfs/Hacking/CTFs/PicoCTF19 ~/pico19
 
-	echo "Installing ATOM"
+	echo "Installing Atom"
+	wget https://atom.io/download/deb -O /tmp/atom.deb
+	dpkg -i /tmp/atom.deb
 
+	prep_shell_env
 }
 
 function to_do()
@@ -133,8 +153,9 @@ response=
 
 function usage ()
 {
-	echo "-h 	--help 				Get this help page."
+
 	echo "-u 	--update	 		Update repos & aptitude packages."
+	echo "-s 	--shell-env	 		Only prep ZSH-Shell env"
 	echo "-g 	--git-only			Install git repos only."
 	echo "-apt 	--apt-only			Install only apt packages. Apt update included."
 	echo "-sf	--shared-folders	-sf | --shared-folders 			Install VMware tools and add softlinks of shared folders to it."
@@ -143,6 +164,8 @@ function usage ()
 	echo "-a 	--full-install		Run the whole script. Recommended by after clean installs."
 	echo ""
 	echo "-w 	--wizzard			Run the wizard."
+	echo ""
+	echo "-h 	--help 				This help page."
 }
 
 function to_imp ()
@@ -176,14 +199,16 @@ if [[ $# -eq 0 ]] ; then
     exit 0
 fi
 
+echo "===== This script was written by DaWoschbar ====="
 echo "Preparing your environment..."
-echo "IMPLEMENT ATOM INSTALLATION!!"
 while [ "$1" != "" ]; do
     case $1 in
         -h | --help ) usage
 		exit;;
 
 		-u | --update )	update_repos update_apt
+		exit;;
+		-s | --shell-env )	prep_shell_env
 		exit;;
 
 		-g | --git-only ) prep_repos
