@@ -40,7 +40,6 @@ function prep_repos()
 
 	else
 		echo "\e[32m >>installing ${repo_name}"
-		#mkdir /opt/$repo_name
 		git clone -q $i /opt/$repo_name
 		echo "Installed $repo_name successfully!"
 	fi
@@ -200,6 +199,7 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 echo "===== This script was written by DaWoschbar ====="
+echo "Find me on GitHub: https://github.com/DaWoschbar"
 echo "Preparing your environment..."
 while [ "$1" != "" ]; do
     case $1 in
