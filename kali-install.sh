@@ -87,6 +87,8 @@ function prep_shell_env()
 	echo "Changing shell to ZSH"
 	chsh -s /bin/zsh
 	echo "IMPLEMENT: Copy custom config file from GITHUB repo"
+	cp .zshrc ~/.zshrc
+
 }
 
 function do_misc ()
@@ -96,14 +98,12 @@ function do_misc ()
 	rmdir rmdir ~/Documents/ ~/Downloads/ ~/Music/ ~/Pictures/ ~/Public/ ~/Videos/ ~/Templates/
 
 	echo "Adding system links from shared folder in the home directory"
-	ln -s /mnt/hgfs/Hacking/vh ~/vh
-	ln -s /mnt/hgfs/Hacking/htb ~/htb
-	ln -s /mnt/hgfs/Hacking/OverTheWire ~/overTheWire
-	ln -s /mnt/hgfs/Hacking/CTFs/PicoCTF19 ~/pico19
 
+	shared-folder-syslinks
 	echo "Installing Atom"
-	wget https://atom.io/download/deb -O /tmp/atom.deb
-	dpkg -i /tmp/atom.deb
+	echo "Currently outcommented!"
+	#wget https://atom.io/download/deb -O /tmp/atom.deb
+	#dpkg -i /tmp/atom.deb
 
 	prep_shell_env
 }
