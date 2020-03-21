@@ -9,6 +9,8 @@ https://github.com/SecureAuthCorp/impacket.git
 https://github.com/pentestmonkey/php-reverse-shell.git
 https://github.com/fox-it/mitm6.git
 https://github.com/Hackplayers/evil-winrm.git
+https://github.com/samratashok/nishang.git
+https://github.com/byt3bl33d3r/CrackMapExec.git
 )
 
 ARRAY_APT=(
@@ -49,12 +51,7 @@ function prep_repos()
 function update_repos ()
 {
 	echo "Updating git repos"
-	for i in "${ARRAY_GIT[@]}"; do
-		basename=$(basename $i)
-		repo_name=${basename%.*}
-		echo ">>Updating ${repo_name}"
-		git pull -q /opt/$i
-	done
+	for d in /opt/*; do cd $d; git stash; (git pull &); cd ..; done
 }
 
 function prep_apt()
@@ -174,8 +171,11 @@ function to_imp ()
 
 function shared-folder-syslinks ()
 {
-	echo "Creating sys links from shared folders..."
+	echo "Running shared folder VMware script..."
+	sh ./sf-setup.sh
 
+
+	echo "Creating sys links from shared folders..."
 	for i in "${ARRAY_FOLDER[@]}"
 	do
 		echo "creating $i"
