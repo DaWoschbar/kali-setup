@@ -207,7 +207,7 @@ fi
 
 echo "===== This script was written by DaWoschbar ====="
 echo "Find me on GitHub: https://github.com/DaWoschbar"
-echo "Preparing your environment..."
+echo -e "\e[96mPreparing your environment..."
 while [ "$1" != "" ]; do
     case $1 in
         -h | --help ) usage
