@@ -41,13 +41,13 @@ function prep_repos()
 	echo "${repo_name} already exists."
 
 		else
-			echo "\e[32m >>installing ${repo_name}"
+			echo " \e[32m=> Installing ${repo_name}"
 			git clone -q $i /opt/$repo_name
 			echo "Installed $repo_name successfully!"
 		fi
 	done
 
-	echo -e "\e[92mFinished Repo Downoad"
+	echo -e "\e[92mFinished Repo Download!"
 }
 
 function update_repos ()
