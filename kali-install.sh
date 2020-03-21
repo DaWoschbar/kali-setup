@@ -30,39 +30,45 @@ CTFs/picoCTF19
 
 function prep_repos()
 {
-	echo "Installing git repos...."
+	echo -e "\e[93mInstalling git repos...."
 
 	for i in "${ARRAY_GIT[@]}"
 	do
 		basename=$(basename $i)
 		repo_name=${basename%.*}
 
-	if [ -d "/opt/$repo_name" ]; then
-   echo "${repo_name} already exists."
+		if [ -d "/opt/$repo_name" ]; then
+	echo "${repo_name} already exists."
 
-	else
-		echo "\e[32m >>installing ${repo_name}"
-		git clone -q $i /opt/$repo_name
-		echo "Installed $repo_name successfully!"
-	fi
+		else
+			echo "\e[32m >>installing ${repo_name}"
+			git clone -q $i /opt/$repo_name
+			echo "Installed $repo_name successfully!"
+		fi
 	done
+
+	echo -e "\e[92mFinished Repo Downoad"
 }
 
 function update_repos ()
 {
-	echo "Updating git repos"
+	echo -e "\e[93mUpdating git repos"
 	for d in /opt/*; do cd $d; git stash; (git pull &); cd ..; done
+
+	echo -e "\e[92mFinished repo updates!"
 }
 
 function prep_apt()
 {
-	echo "Installing Aptitude packages"
+	echo -e "\e[93mInstalling Aptitude packages"
 	echo "update APTITUDE"
 	apt update
 	for i in "${ARRAY_APT[@]}"; do
-		echo ">>installing ${i}"
+		echo -e " => \e[93mInstalling ${i}"
 		apt install $i -y -qq
 	done
+
+	echo -e "\e[92mFinished download apt packages"
 }
 
 function update_apt ()
@@ -74,6 +80,8 @@ function update_apt ()
 		echo ">>installing ${i}"
 		apt update $i -y -qq
 	done
+
+	echo -e "\e[92mFinished apt update"
 }
 
 function prep_shell_env()
@@ -84,7 +92,7 @@ function prep_shell_env()
 	echo "Changing shell to ZSH"
 	chsh -s /bin/zsh
 	echo "IMPLEMENT: Copy custom config file from GITHUB repo"
-	cp .zshrc ~/.zshrc
+	cp -r /opt/kali-setup/.zshrc ~/.zshrc
 
 }
 
@@ -99,8 +107,11 @@ function do_misc ()
 	shared-folder-syslinks
 	echo "Installing Atom"
 	echo "Currently outcommented!"
-	#wget https://atom.io/download/deb -O /tmp/atom.deb
-	#dpkg -i /tmp/atom.deb
+	wget https://atom.io/download/deb -O /tmp/atom.deb
+	dpkg -i /tmp/atom.deb
+
+	echo "Disable auto-suspend..."
+	systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
 	prep_shell_env
 }
@@ -115,10 +126,6 @@ function to_do()
 	echo "- autologin in virtual machine"
 	echo "- OneDrive Shared folder"
 	echo "- colored output"
-	echo "- A setup/Wizzard -> choose what exactly to do..."
-	echo ""
-	echo "Link to 'Wizzard' resources:"
-	echo "http://linuxcommand.org/lc3_wss0120.php"
 }
 
 function wizzard ()
