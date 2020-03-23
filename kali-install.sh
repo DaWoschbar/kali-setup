@@ -32,14 +32,21 @@ function prep_repos()
 {
 	echo -e "\e[93mInstalling git repos..."
 
+	read -r -p "Should the existing repos in /opt/ updated before the install? [Y/n] " response
+	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
+	then
+		update_repos
+	fi
+
 	for i in "${ARRAY_GIT[@]}"
 	do
 		basename=$(basename $i)
 		repo_name=${basename%.*}
 
 		if [ -d "/opt/$repo_name" ]; then
-	echo "${repo_name} already exists."
-
+			echo "${repo_name} already exists"#, updating instead"
+			#git stash /opt/${repo_name}
+			#git pull /opt/${repo_name}
 		else
 			echo " => \e[32mInstalling ${repo_name}"
 			git clone -q $i /opt/$repo_name
