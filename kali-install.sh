@@ -30,7 +30,7 @@ CTFs/picoCTF19
 
 function prep_repos()
 {
-	echo -e "\e[93mInstalling git repos...."
+	echo -e "\e[93mInstalling git repos..."
 
 	for i in "${ARRAY_GIT[@]}"
 	do
@@ -41,7 +41,7 @@ function prep_repos()
 	echo "${repo_name} already exists."
 
 		else
-			echo " \e[32m=> Installing ${repo_name}"
+			echo " => \e[32mInstalling ${repo_name}"
 			git clone -q $i /opt/$repo_name
 			echo "Installed $repo_name successfully!"
 		fi
@@ -91,7 +91,6 @@ function prep_shell_env()
 
 	echo "Changing shell to ZSH"
 	chsh -s /bin/zsh
-	echo "IMPLEMENT: Copy custom config file from GITHUB repo"
 	cp -r /opt/kali-setup/.zshrc ~/.zshrc
 
 }
@@ -105,10 +104,27 @@ function do_misc ()
 	echo "Adding system links from shared folder in the home directory"
 
 	shared-folder-syslinks
-	echo "Installing Atom"
-	echo "Currently outcommented!"
-	wget https://atom.io/download/deb -O /tmp/atom.deb
-	dpkg -i /tmp/atom.deb
+	
+	read -r -p "Should Atom be installed? [y/N] " response
+	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
+	then
+		#echo -e "\e[93mCheck if atom is installed, help: https://discuss.atom.io/t/is-there-a-way-to-detect-if-atom-is-installed-on-a-computer/61029/2"
+		wget https://atom.io/download/deb -O /tmp/atom.deb
+		dpkg -i /tmp/atom.deb
+	fi
+
+	read -r -p "Should autologon be enabled (recommended on VMs)? [y/N] " response
+	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
+	then
+		echo "AutomaticLoginEnable = true" >> /etc/gdm3/daemon.conf
+		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conf
+	fi
+
+	read -r -p "Should repos in /opt/ checked for updates? [y/N] " response
+	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
+	then
+		update_repos
+	fi
 
 	echo "Disable auto-suspend..."
 	systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
@@ -179,7 +195,15 @@ function to_imp ()
 function shared-folder-syslinks ()
 {
 	echo "Running shared folder VMware script..."
-	sh ./sf-setup.sh
+	vmware-hgfsclient | while read folder; do
+		vmwpath="/mnt/hgfs/\${folder}"
+		echo "[i] Mounting \${folder}   (\${vmwpath})"
+		sudo mkdir -p "\${vmwpath}"
+		sudo umount -f "\${vmwpath}" 2>/dev/null
+		sudo vmhgfs-fuse -o allow_other -o auto_unmount ".host:/\${folder}" "\${vmwpath}"
+	done
+	sleep 2s
+
 
 
 	echo "Creating sys links from shared folders..."
