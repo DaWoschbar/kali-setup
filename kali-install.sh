@@ -10,7 +10,7 @@ https://github.com/pentestmonkey/php-reverse-shell.git
 https://github.com/fox-it/mitm6.git
 https://github.com/Hackplayers/evil-winrm.git
 https://github.com/samratashok/nishang.git
-https://github.com/byt3bl33d3r/CrackMapExec.git
+https://github.com/trustedsec/unicorn.git
 )
 
 ARRAY_APT=(
@@ -19,6 +19,8 @@ hexedit
 tmux
 python-pip
 python3-pip
+xclip
+cme
 )
 
 ARRAY_FOLDER=(
