@@ -20,7 +20,7 @@ tmux
 python-pip
 python3-pip
 xclip
-cme
+crackmapexec
 )
 
 ARRAY_FOLDER=(
