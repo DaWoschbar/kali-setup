@@ -123,14 +123,14 @@ function do_misc()
 		dpkg -i /tmp/atom.deb
 	fi
 
-	read -r -p "Should autologon be enabled (recommended on VMs)? [y/N] " response
+	read -r -p "Should autologon be enabled (recommended on VMs)\? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 		echo "AutomaticLoginEnable = true" >> /etc/gdm3/daemon.conf
 		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conf
 	fi
 
-	read -r -p "Should repos in /opt/ checked for updates? [y/N] " response
+	read -r -p "Should repos in /opt/ checked for updates\? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 		update_repos
