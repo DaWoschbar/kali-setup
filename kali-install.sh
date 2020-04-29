@@ -21,6 +21,7 @@ python-pip
 python3-pip
 xclip
 crackmapexec
+exiftool
 )
 
 ARRAY_FOLDER=(
@@ -59,7 +60,7 @@ function prep_repos()
 	echo -e "\e[92mFinished Repo Download!"
 }
 
-function update_repos ()
+function update_repos()
 {
 	echo -e "\e[93mUpdating git repos"
 	for d in /opt/*; do cd $d; git stash; (git pull &); cd ..; done
@@ -80,7 +81,7 @@ function prep_apt()
 	echo -e "\e[92mFinished download apt packages"
 }
 
-function update_apt ()
+function update_apt()
 {
 	echo "Updating Aptitude packages"
 	echo "update APTITUDE"
@@ -104,7 +105,7 @@ function prep_shell_env()
 
 }
 
-function do_misc ()
+function do_misc()
 {
 	echo "Executing misc"
 	echo "Removing unnecessary folders..."
@@ -153,32 +154,6 @@ function to_do()
 	echo "- colored output"
 }
 
-function wizzard ()
-{
-	usage
-response=
-    echo -n "Choose an option > "
-    read response
-
-    if [ -a "$response" ]; then
-        prep_repos
-		prep_apt
-		do_misc
-    fi
-
-	if [ -apt "$response" ]; then
-        prep_apt
-    fi
-
-	if [ -g "$response" ]; then
-        prep_repos
-    fi
-
-	if [ -m "$response" ]; then
-        do_misc
-    fi
-}
-
 function usage ()
 {
 
@@ -190,8 +165,6 @@ function usage ()
 	echo "-m 	--misc-only			Execute misc tasks like removing home folders."
 	echo "		--to-do				Print the to-do list."
 	echo "-a 	--full-install		Run the whole script. Recommended by after clean installs."
-	echo ""
-	echo "-w 	--wizzard			Run the wizard."
 	echo ""
 	echo "-h 	--help 				This help page."
 }
@@ -212,8 +185,6 @@ function shared-folder-syslinks ()
 		sudo vmhgfs-fuse -o allow_other -o auto_unmount ".host:/\${folder}" "\${vmwpath}"
 	done
 	sleep 2s
-
-
 
 	echo "Creating sys links from shared folders..."
 	for i in "${ARRAY_FOLDER[@]}"
@@ -270,9 +241,6 @@ while [ "$1" != "" ]; do
 		exit;;
 
 		-a | --full-install ) full_install
-		exit;;
-
-		-w | --wizzard )	wizzard
 		exit;;
 
         * ) echo "Invalid argument" usage
