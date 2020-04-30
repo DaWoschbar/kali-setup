@@ -63,7 +63,7 @@ function prep_repos()
 function update_repos()
 {
 	echo -e "\e[93mUpdating git repos"
-	for d in /opt/*; do cd $d; git stash; (git pull &); cd ..; done
+	for d in /opt/*; do cd $d; git stash --quiet; (git pull --quiet &); cd ..; done
 
 	echo -e "\e[92mFinished repo updates!"
 }
@@ -130,13 +130,13 @@ function do_misc()
 		echo "AutomaticLoginEnable = true" >> /etc/gdm3/daemon.conf
 		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conff
 	fi
-
+	'
 	read -r -p "Should repos in /opt/ checked for updates? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 		update_repos
 	fi
-	'
+	
 	echo "Disable auto-suspend..."
 	systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
