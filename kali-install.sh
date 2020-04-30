@@ -11,6 +11,11 @@ https://github.com/fox-it/mitm6.git
 https://github.com/Hackplayers/evil-winrm.git
 https://github.com/samratashok/nishang.git
 https://github.com/trustedsec/unicorn.git
+https://github.com/SecureAuthCorp/impacket.git
+)
+
+GIT_PYTHON=(
+https://github.com/SecureAuthCorp/impacket.git
 )
 
 ARRAY_APT=(
@@ -46,15 +51,10 @@ function prep_repos()
 		basename=$(basename $i)
 		repo_name=${basename%.*}
 
-		if [ -d "/opt/$repo_name" ]; then
-			echo "${repo_name} already exists"#, updating instead"
-			#git stash /opt/${repo_name}
-			#git pull /opt/${repo_name}
-		else
-			echo " => \e[32mInstalling ${repo_name}"
-			git clone -q $i /opt/$repo_name
-			echo "Installed $repo_name successfully!"
-		fi
+		echo " => \e[32mInstalling ${repo_name}"
+		git clone -q $i /opt/$repo_name
+		echo "Installed $repo_name successfully!"
+
 	done
 
 	echo -e "\e[92mFinished Repo Download!"
@@ -123,19 +123,20 @@ function do_misc()
 		dpkg -i /tmp/atom.deb
 	fi
 
-	read -r -p "Should autologon be enabled (recommended on VMs)\? [y/N] " response
+	:'
+	read -r -p "Should autologon be enabled? - recommended on VMs [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 		echo "AutomaticLoginEnable = true" >> /etc/gdm3/daemon.conf
-		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conf
+		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conff
 	fi
 
-	read -r -p "Should repos in /opt/ checked for updates\? [y/N] " response
+	read -r -p "Should repos in /opt/ checked for updates? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 		update_repos
 	fi
-
+	'
 	echo "Disable auto-suspend..."
 	systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
@@ -177,14 +178,9 @@ function to_imp ()
 function shared-folder-syslinks ()
 {
 	echo "Running shared folder VMware script..."
-	vmware-hgfsclient | while read folder; do
-		vmwpath="/mnt/hgfs/\${folder}"
-		echo "[i] Mounting \${folder}   (\${vmwpath})"
-		sudo mkdir -p "\${vmwpath}"
-		sudo umount -f "\${vmwpath}" 2>/dev/null
-		sudo vmhgfs-fuse -o allow_other -o auto_unmount ".host:/\${folder}" "\${vmwpath}"
-	done
-	sleep 2s
+	dir=$(pwd)
+	cp dir/mount-shared-folders ~/Desktop/
+	~/mount-shared-folders
 
 	echo "Creating sys links from shared folders..."
 	for i in "${ARRAY_FOLDER[@]}"
