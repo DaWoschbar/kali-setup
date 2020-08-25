@@ -1,0 +1,2 @@
+- add "gem" to apt install list
+    Otherwise the gem packages cannot be installed
