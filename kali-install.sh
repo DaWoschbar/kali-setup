@@ -28,6 +28,7 @@ python3-pip
 xclip
 crackmapexec
 exiftool
+gem
 )
 
 ARRAY_FOLDER=(
@@ -248,8 +249,8 @@ function shared-folder-syslinks ()
 
 function full_install ()
 {
-	prep_repos
 	prep_apt
+	prep_repos
 	prep_ruby
 	do_misc
 }
