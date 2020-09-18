@@ -1,5 +1,0 @@
-CMSmap, crachmapexec, BC Security Empire, Eyewitness, gobuster, LinEnum, proxmark3, routersploit, S.E.T., Sublist3r, Windows-Exploit-Suggester
-
-Impacket, Responder
-
-powerHub, Bloodhound und neo4j
