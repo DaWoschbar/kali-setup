@@ -45,6 +45,7 @@ bloodhound
 nikto
 neo4j
 open-vm-tools
+gem
 )
 
 #Color Legend:
@@ -235,8 +236,8 @@ function usage ()
 
 function full_install ()
 {
-	prep_repos
 	prep_apt
+	prep_repos
 	prep_ruby
 	do_misc
 }
