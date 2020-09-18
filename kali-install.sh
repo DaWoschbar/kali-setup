@@ -1,22 +1,29 @@
 #!/bin/bash
 ARRAY_GIT=(
 https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite.git
-#https://github.com/rebootuser/LinEnum.git
-#https://github.com/danielmiessler/SecLists.git
-#https://github.com/ffuf/ffuf.git
-#https://github.com/PowerShellMafia/PowerSploit.git
-#https://github.com/SecureAuthCorp/impacket.git
-#https://github.com/pentestmonkey/php-reverse-shell.git
-#https://github.com/fox-it/mitm6.git
-#https://github.com/samratashok/nishang.git
-#https://github.com/FortyNorthSecurity/EyeWitness
-#https://github.com/gentilkiwi/mimikatz.git
+https://github.com/rebootuser/LinEnum.git
+https://github.com/danielmiessler/SecLists.git
+https://github.com/ffuf/ffuf.git
+https://github.com/PowerShellMafia/PowerSploit.git
+https://github.com/pentestmonkey/php-reverse-shell.git
+https://github.com/fox-it/mitm6.git
+https://github.com/samratashok/nishang.git
+https://github.com/FortyNorthSecurity/EyeWitness
+https://github.com/gentilkiwi/mimikatz.git
+https://github.com/mishmashclone/BC-SECURITY-Empire.git
+https://github.com/lgandx/Responder.git
+https://github.com/AonCyberLabs/Windows-Exploit-Suggester.git
+https://github.com/Proxmark/proxmark3.git
+https://github.com/FortyNorthSecurity/EyeWitness.git
+
 )
 
 GIT_PYTHON=(
 https://github.com/SecureAuthCorp/impacket.git
-#https://github.com/Dionach/CMSmap.git
-#https://github.com/aboul3la/Sublist3r.git
+https://github.com/Dionach/CMSmap.git
+https://github.com/aboul3la/Sublist3r.git
+https://github.com/AdrianVollmer/PowerHub.git
+https://github.com/threat9/routersploit.git
 )
 
 ARRAY_RUBY=(
@@ -36,14 +43,10 @@ crackmapexec
 exiftool
 bloodhound
 nikto
+neo4j
 open-vm-tools
 )
 
-ARRAY_FOLDER=(
-vh
-overTheWire
-htb
-)
 #Color Legend:
 # Red = Cannot/Won't do it							\e[91
 # Yellow = Info (ex. something already exists)		\e[93m
@@ -167,9 +170,6 @@ function update_ruby()
 function do_misc()
 {
 	echo -e "\e[93m[*] Executing misc"
-	echo -e "\e[93m[!] Removing unnecessary folders..."
-	rmdir rmdir ~/Documents/ ~/Downloads/ ~/Music/ ~/Pictures/ ~/Public/ ~/Videos/ ~/Templates/ 2> /dev/null
-
 	read -r -p "[?] Should autologin be enabled? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
@@ -263,15 +263,10 @@ while [ $# -gt 0 ] #getopts "p:husgma" opt
 do
     case $1 in
         -h | --help ) usage;;
-	
 		-u | --update )	full_update;;
-		
 		-s | --shell-env )	prep_shell_env;;
-
 		-g | --git-only ) prep_repos;;
-
 		-apt | --apt-only )	prep_apt;;
-
 		-m | --misc-only )	do_misc;;
 		-p | --profile ) 
 			shift
@@ -279,7 +274,7 @@ do
 					export PROFILE=$1
 					install_profile $PROFILE
 				else
-					echo "Profile name not specified!"
+					echo "Profile name not specified or invalid name!"
 					echo "The profilename must match the folder in the current working directory!"
 				fi
 			shift;;
@@ -293,5 +288,6 @@ do
 done
 
 
-echo "[!] Installation finished!"
-echo "[!] Depending on the dependenciese and packages, your pc might need a reboot."
+echo -e "\e[91m[!] Installation finished!"
+echo -e "\e[91m[!] Depending on the dependenciese and packages, your pc might need a reboot."
+echo -e "\e[91m[!] Keep in mind that some tools require manual installation!"
