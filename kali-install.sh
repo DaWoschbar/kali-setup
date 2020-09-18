@@ -223,7 +223,6 @@ function install_profile()
 
 function usage ()
 {
-
 	echo "-u 		--update	 		Update git repos & aptitude packages ."
 	echo "-s 		--shell-env	 		Only prep ZSH-Shell env"
 	echo "-apt 		--apt-only			Install only apt packages. Apt update included."
@@ -260,25 +259,20 @@ echo "===== This script was written by DaWoschbar ====="
 echo "Find me on GitHub: https://github.com/DaWoschbar"
 echo -e "\e[96mPreparing your environment..."
 
-while [ "$1" != "" ]; do
+while [ $# -gt 0 ] #getopts "p:husgma" opt
+do
     case $1 in
-        -h | --help ) usage
-		exit;;
+        -h | --help ) usage;;
+	
+		-u | --update )	full_update;;
+		
+		-s | --shell-env )	prep_shell_env;;
 
-		-u | --update )	full_update
-		exit;;
-		-s | --shell-env )	prep_shell_env
-		exit;;
+		-g | --git-only ) prep_repos;;
 
-		-g | --git-only ) prep_repos
-		exit;;
+		-apt | --apt-only )	prep_apt;;
 
-		-apt | --apt-only )	prep_apt
-		exit;;
-
-		-m | --misc-only )	do_misc
-		exit;;
-
+		-m | --misc-only )	do_misc;;
 		-p | --profile ) 
 			shift
 				if test $# -gt 0; then
@@ -287,16 +281,17 @@ while [ "$1" != "" ]; do
 				else
 					echo "Profile name not specified!"
 					echo "The profilename must match the folder in the current working directory!"
-					exit 1
 				fi
-			shift
-		exit;;
+			shift;;
 
-		-a | --full-install ) full_install
-		exit;;
+		-a | --full-install ) full_install;;
 
-        * ) echo "Invalid argument" usage
-		exit 1
+        * ) echo -e "\e[0mInvalid arguments!\n\nUsage:"; usage
+		exit 1;;
     esac
     shift
 done
+
+
+echo "[!] Installation finished!"
+echo "[!] Depending on the dependenciese and packages, your pc might need a reboot."
