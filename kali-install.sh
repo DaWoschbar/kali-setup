@@ -9,10 +9,14 @@ https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite.git
 #https://github.com/pentestmonkey/php-reverse-shell.git
 #https://github.com/fox-it/mitm6.git
 #https://github.com/samratashok/nishang.git
+#https://github.com/FortyNorthSecurity/EyeWitness
+#https://github.com/gentilkiwi/mimikatz.git
 )
 
 GIT_PYTHON=(
 https://github.com/SecureAuthCorp/impacket.git
+#https://github.com/Dionach/CMSmap.git
+#https://github.com/aboul3la/Sublist3r.git
 )
 
 ARRAY_RUBY=(
@@ -23,13 +27,16 @@ ARRAY_APT=(
 gobuster
 hexedit
 tmux
-crackmapexec
+python
+python3
 python-pip
 python3-pip
 xclip
 crackmapexec
 exiftool
 bloodhound
+nikto
+open-vm-tools
 )
 
 ARRAY_FOLDER=(
@@ -95,7 +102,7 @@ function update_repos()
 		cd $d;
 		if [[ -d $d/.git ]]
 		then
-			echo " => \e[32mUpdating $d"; git stash --quiet; (git pull --quiet &); cd ..;
+			echo -e "\e[93m => Updating $d"; git stash --quiet; (git pull --quiet &); cd ..;
 		fi
 	done
 	echo -e "\e[92m[*] Finished repo updates!"
@@ -126,7 +133,7 @@ function update_apt()
 	echo -e "\e[93m[!] Running apt autoremove..."
 	apt-get autoremove -y -qq
 
-	echo -e "\e[92m Finished apt update!"
+	echo -e "\e[92m[*] Finished apt update!"
 }
 
 function prep_ruby()
@@ -181,8 +188,8 @@ function do_misc()
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 	#I was told this part can be done using sed, but I just don't know how
-		echo "AutomaticLoginEnable = true" >> /etc/gdm3/daemon.conf
-		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conf
+		sed -i "s/#  TimedLoginEnable = true/TimedLoginEnable = true/" /etc/gdm3/daemon.conf
+		sed -i "s/#  AutomaticLogin = user1/AutomaticLogin = root/" /etc/gdm3/daemon.conf
 	fi
 	
 	echo -e "\e[93m[!] Disable auto-suspend and redefine lockout rules ..."
