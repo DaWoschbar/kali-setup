@@ -1,15 +1,14 @@
 #!/bin/bash
 ARRAY_GIT=(
 https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite.git
-https://github.com/rebootuser/LinEnum.git
-https://github.com/danielmiessler/SecLists.git
-https://github.com/ffuf/ffuf.git
-https://github.com/PowerShellMafia/PowerSploit.git
-https://github.com/SecureAuthCorp/impacket.git
-https://github.com/pentestmonkey/php-reverse-shell.git
-https://github.com/fox-it/mitm6.git
-https://github.com/samratashok/nishang.git
-https://github.com/trustedsec/unicorn.git
+#https://github.com/rebootuser/LinEnum.git
+#https://github.com/danielmiessler/SecLists.git
+#https://github.com/ffuf/ffuf.git
+#https://github.com/PowerShellMafia/PowerSploit.git
+#https://github.com/SecureAuthCorp/impacket.git
+#https://github.com/pentestmonkey/php-reverse-shell.git
+#https://github.com/fox-it/mitm6.git
+#https://github.com/samratashok/nishang.git
 )
 
 GIT_PYTHON=(
@@ -24,10 +23,13 @@ ARRAY_APT=(
 gobuster
 hexedit
 tmux
+crackmapexec
+python-pip
 python3-pip
 xclip
 crackmapexec
 exiftool
+bloodhound
 )
 
 ARRAY_FOLDER=(
@@ -36,11 +38,16 @@ overTheWire
 htb
 )
 
+#Color Legend:
+# Red = Cannot/Won't do it							\e[91
+# Yellow = Info (ex. something already exists)		\e[93m
+# Green = done										\e[92m
+
 function prep_repos()
 {
-	echo -e "\e[93m Installing git repos..."
+	echo -e "\e[93mInstalling git repos..."
 
-	read -r -p "Should the existing repos in /opt/ updated before the install? [y/N] " response
+	read -r -p "[?] Should the existing repos in /opt/ updated before the install? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 		update_repos
@@ -53,11 +60,10 @@ function prep_repos()
 
 		if [[ -d "/opt/$repo_name" ]]
 		then
-			echo "$repo_name already exists in /opt!"
+			echo -e " => \e[93m[!] $repo_name already exists in /opt/ - skipping..."
 		else
-			echo " => \e[32m Installing ${repo_name}"
+			echo -e " => \e[32mInstalling ${repo_name}"
 			git clone -q $i /opt/$repo_name
-			echo "Installed $repo_name successfully!"
 		fi
 	done
 
@@ -68,82 +74,75 @@ function prep_repos()
 
 		if [[ -d "/opt/$repo_name" ]]
 		then
-			echo "$repo_name already exists in /opt!"
+			echo -e " => \e[93m[!] $repo_name already exists in /opt/ - skipping..."
 		else
-			echo " => \e[32mInstalling ${repo_name}"
+			echo -e " => \e[32mInstalling ${repo_name}"
 			git clone -q $i /opt/$repo_name
 			pip3 install -r /opt/$repo_name/requirements.txt > /dev/null
 			python3 /opt/$repo_name/setup.py install > /dev/null
-			echo "Installed $repo_name successfully!"
 		fi		
 	done
 
-	echo -e "\e[92m Finished Repo Download!"
+	echo -e "\e[92m[*] Finished Github Repository download!"
 }
 
 function update_repos()
 {
-	echo -e "\e[93mUpdating git repos"
+	echo -e "Updating git repos..."
 	
 	for d in /opt/*
-	do
+	do	
 		cd $d;
 		if [[ -d $d/.git ]]
 		then
-			echo " => Updating $d"; git stash --quiet; (git pull --quiet &); cd ..;
+			echo " => \e[32mUpdating $d"; git stash --quiet; (git pull --quiet &); cd ..;
 		fi
 	done
-	echo -e "\e[92mFinished repo updates!"
+	echo -e "\e[92m[*] Finished repo updates!"
 }
 
 function prep_apt()
 {
-	echo -e "\e[93m Installing Aptitude packages"
-	echo "update APTITUDE"
-	apt-get update > /dev/null
+	echo -e "\e[93mInstalling apt packages..."
+	apt-get update -y > /dev/null
 	for i in "${ARRAY_APT[@]}"; do
 		echo -e " => \e[93m Installing ${i}"
 		apt-get install $i -y -qq >/dev/null
 	done
 
-	echo -e "\e[93m Performing apt full-upgrade..."
+	echo -e "\e[93m[*] Performing apt full-upgrade..."
 	apt-get full-upgrade -y -qq
-	echo -e "\e[93m Performing apt autoremove..."
+	echo -e "\e[93m[*] Performing apt autoremove..."
 	apt-get autoremove -y -qq
 
-	echo -e "\e[92m Finished download apt packages"
+	echo -e "\e[92m[*] Finished download apt packages!"
 }
 
 function update_apt()
 {
-	echo "Updating Aptitude packages"
-	echo "update APTITUDE"
-	apt-get update -qq
-	for i in "${ARRAY_APT[@]}"; do
-		echo "=> Updating ${i}"
-		apt-get update $i -y -qq
-	done
+	echo "Updating apt packages..."
+	apt-get update -qq -y
 
-	echo -e "\e[92m Finished apt update"
-
-	echo "Running apt autoremove..."
+	echo -e "\e[93m[!] Running apt autoremove..."
 	apt-get autoremove -y -qq
+
+	echo -e "\e[92m Finished apt update!"
 }
 
 function prep_ruby()
 {
-	echo -e "\e[93m Installing Ruby gem packages"
+	echo -e "\e[93mInstalling Ruby gem packages..."
 	
 	for i in "${ARRAY_RUBY[@]}"
 	do
 		basename=$(basename $i)
 		repo_name=${basename%.*}
 
-		echo -e " => \e[32mInstalling ${repo_name}"
+		echo -e " => \e[93mInstalling ${repo_name}"
 		gem install $basename --silent
-		echo "Installed $repo_name successfully!"
-
 	done
+
+	echo -e "\e[92m[*] Sucessfully installed ruby packages!"
 }
 
 function update_ruby()
@@ -156,7 +155,7 @@ function update_ruby()
 		echo -e " => \e[32m Updating ${repo_name}"
 		gem update $basename --silent
 	done
-	echo -e "Finished ruby updates"
+	echo -e "\e[92m[*] Finished ruby updates!"
 }
 
 function prep_shell_env()
@@ -167,53 +166,50 @@ function prep_shell_env()
 	echo "Changing shell to ZSH"
 	chsh -s /bin/zsh
 	cp -r /opt/kali-setup/.zshrc ~/.zshrc
-
 }
 
 function do_misc()
 {
-	echo "Executing misc"
-	echo "Removing unnecessary folders..."
+	echo -e "\e[93m[*] Executing misc"
+	echo -e "\e[93m[!] Removing unnecessary folders..."
 	rmdir rmdir ~/Documents/ ~/Downloads/ ~/Music/ ~/Pictures/ ~/Public/ ~/Videos/ ~/Templates/ 2> /dev/null
 
-	echo "Adding system links from shared folder in the home directory"
+	echo -e "\e[93m[!] Adding system links from shared folder in the home directory"
 	shared-folder-syslinks
-	
-	read -r -p "Should Atom be installed? [y/N] " response
-	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
-	then
-		#echo -e "\e[93mCheck if atom is installed, help: https://discuss.atom.io/t/is-there-a-way-to-detect-if-atom-is-installed-on-a-computer/61029/2"
-		wget https://atom.io/download/deb -O /tmp/atom.deb
-		dpkg -i /tmp/atom.deb
-	fi
 
-	read -r -p "Should autologon be enabled? [y/N] " response
+	read -r -p "[?] Should autologin be enabled? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
+	#I was told this part can be done using sed, but I just don't know how
 		echo "AutomaticLoginEnable = true" >> /etc/gdm3/daemon.conf
-		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conff
+		echo "AutomaticLogin = root" >> /etc/gdm3/daemon.conf
 	fi
 	
-	read -r -p "Should repos in /opt/ checked for updates? [y/N] " response
-	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
-	then
-		update_repos
-	fi
-	
-	echo "Disable auto-suspend..."
+	echo -e "\e[93m[!] Disable auto-suspend and redefine lockout rules ..."
 	systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+	 # disable session idle
+    gsettings set org.gnome.desktop.session idle-delay 0
+    # disable sleep when on AC power
+    gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+    # disable screen timeout on AC
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/blank-on-ac -s 0 --create --type int
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-on-ac-off -s 0 --create --type int
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-on-ac-sleep -s 0 --create --type int
+    # disable sleep when on AC
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/inactivity-on-ac -s 14 --create --type int
+    # hibernate when power is critical
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/critical-power-action -s 2 --create --type int
 
-	prep_shell_env
-}
+	#prep_shell_env
 
-function to_do()
-{
-	echo "****Consider the following actions to be implemented in the future... ****"
-	echo "- APT: Stegosolve, stegohide"
-	echo "- Automatic installation of some installed git repos"
-	echo "- Install FoxyProxy and try to configure it automatically (if possible)"
-	echo "- OneDrive Shared folder"
-	echo "- colored output"
+	if [ ! -f /usr/share/wordlists/rockyou.txt ]; then
+		echo -e "\e[93m[!] Unpacking rockyou.txt"
+		gunzip /usr/share/wordlists/rockyou.txt.gz 2>/dev/null
+	else
+		echo -e "\e[93m[!] Rockyou.txt already exists unpacked - skipping!"
+	fi
+	
+
 }
 
 function usage ()
@@ -232,10 +228,7 @@ function usage ()
 
 function shared-folder-syslinks ()
 {
-	#echo "Running shared folder VMware script..."	
-	#cp /opt/kali-setup/mount-shared-folders ~/Desktop/
-
-	echo "Creating sys links from shared folders..."
+	echo -e "\e[93m[*] Creating sys links from shared folders..."
 	for i in "${ARRAY_FOLDER[@]}"
 	do
 		if [[ ! -d ~/$i ]]
@@ -307,6 +300,3 @@ while [ "$1" != "" ]; do
     esac
     shift
 done
-
-
-echo -e "Script ended."
