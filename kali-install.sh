@@ -44,7 +44,6 @@ vh
 overTheWire
 htb
 )
-
 #Color Legend:
 # Red = Cannot/Won't do it							\e[91
 # Yellow = Info (ex. something already exists)		\e[93m
@@ -165,24 +164,11 @@ function update_ruby()
 	echo -e "\e[92m[*] Finished ruby updates!"
 }
 
-function prep_shell_env()
-{
-	echo "Preparing ZSH-Shell environment"
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-
-	echo "Changing shell to ZSH"
-	chsh -s /bin/zsh
-	cp -r /opt/kali-setup/.zshrc ~/.zshrc
-}
-
 function do_misc()
 {
 	echo -e "\e[93m[*] Executing misc"
 	echo -e "\e[93m[!] Removing unnecessary folders..."
 	rmdir rmdir ~/Documents/ ~/Downloads/ ~/Music/ ~/Pictures/ ~/Public/ ~/Videos/ ~/Templates/ 2> /dev/null
-
-	echo -e "\e[93m[!] Adding system links from shared folder in the home directory"
-	shared-folder-syslinks
 
 	read -r -p "[?] Should autologin be enabled? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
@@ -207,8 +193,6 @@ function do_misc()
     # hibernate when power is critical
     xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/critical-power-action -s 2 --create --type int
 
-	#prep_shell_env
-
 	if [ ! -f /usr/share/wordlists/rockyou.txt ]; then
 		echo -e "\e[93m[!] Unpacking rockyou.txt"
 		gunzip /usr/share/wordlists/rockyou.txt.gz 2>/dev/null
@@ -219,31 +203,35 @@ function do_misc()
 
 }
 
+function install_profile()
+{
+	PROFILE_NAME=$1
+	
+	if [ -d $PROFILE_NAME ]; then
+		if [ -f $PROFILE_NAME/profile.sh ]; then
+
+			echo -e "\e[93m[*] Applying profile settings from $PROFILE_NAME"
+			$PROFILE_NAME/profile.sh $PROFILE_NAME
+		else
+			echo -e "\e[93m[!] Error: Missing profile.sh in $PROFILE_NAME!"
+		fi
+	else
+		echo -e "\e[93m[!] Error: the specified profilename does not match the directory!"
+		exit 1;
+	fi
+}
+
 function usage ()
 {
 
-	echo "-u 	--update	 		Update git repos & aptitude packages ."
-	echo "-s 	--shell-env	 		Only prep ZSH-Shell env"
-	echo "-apt 	--apt-only			Install only apt packages. Apt update included."
-	echo "-sf	--shared-folders	-sf | --shared-folders 			Install VMware tools and add softlinks of shared folders to it."
-	echo "-m 	--misc-only			Execute misc tasks like removing home folders."
-	echo "		--to-do				Print the to-do list."
-	echo "-a 	--full-install		Run the whole script. Recommended by after clean installs."
+	echo "-u 		--update	 		Update git repos & aptitude packages ."
+	echo "-s 		--shell-env	 		Only prep ZSH-Shell env"
+	echo "-apt 		--apt-only			Install only apt packages. Apt update included."
+	echo "-m 		--misc-only			Execute misc tasks like removing home folders."
+	echo "-a 		--full-install		Run the whole script. Recommended by after clean installs."
+	#echo "-p <name>	--profile <name>	Executes the task with the specified profile - the given name must be the same as the current working directory. "
 	echo ""
-	echo "-h 	--help 				This help page."
-}
-
-function shared-folder-syslinks ()
-{
-	echo -e "\e[93m[*] Creating sys links from shared folders..."
-	for i in "${ARRAY_FOLDER[@]}"
-	do
-		if [[ ! -d ~/$i ]]
-		then
-			echo "Creating $i"
-			ln -s /mnt/hgfs/Hacking/$i ~/$i
-		fi
-	done
+	echo "-h 		--help 				This help page."
 }
 
 function full_install ()
@@ -271,6 +259,7 @@ fi
 echo "===== This script was written by DaWoschbar ====="
 echo "Find me on GitHub: https://github.com/DaWoschbar"
 echo -e "\e[96mPreparing your environment..."
+
 while [ "$1" != "" ]; do
     case $1 in
         -h | --help ) usage
@@ -290,13 +279,17 @@ while [ "$1" != "" ]; do
 		-m | --misc-only )	do_misc
 		exit;;
 
-		-sf | --shared-folders ) shared-folder-syslinks
-		exit;;
-
-		-sl | --soft-links ) shared-folder-syslinks
-		exit;;
-
-		--to-do ) to_do
+		-p | --profile ) 
+			shift
+				if test $# -gt 0; then
+					export PROFILE=$1
+					install_profile $PROFILE
+				else
+					echo "Profile name not specified!"
+					echo "The profilename must match the folder in the current working directory!"
+					exit 1
+				fi
+			shift
 		exit;;
 
 		-a | --full-install ) full_install
