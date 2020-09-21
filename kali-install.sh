@@ -15,7 +15,6 @@ https://github.com/lgandx/Responder.git
 https://github.com/AonCyberLabs/Windows-Exploit-Suggester.git
 https://github.com/Proxmark/proxmark3.git
 https://github.com/FortyNorthSecurity/EyeWitness.git
-
 )
 
 GIT_PYTHON=(
@@ -87,7 +86,7 @@ function prep_repos()
 			echo -e " => \e[93m[!] $repo_name already exists in /opt/ - skipping..."
 		else
 			echo -e " => \e[32mInstalling ${repo_name}"
-			git clone -q $i /opt/$repo_name
+			git clone -q $i /opt/$repo_name 
 			pip3 install -r /opt/$repo_name/requirements.txt > /dev/null
 			python3 /opt/$repo_name/setup.py install > /dev/null
 		fi		
@@ -229,7 +228,7 @@ function usage ()
 	echo "-apt 		--apt-only			Install only apt packages. Apt update included."
 	echo "-m 		--misc-only			Execute misc tasks like removing home folders."
 	echo "-a 		--full-install		Run the whole script. Recommended by after clean installs."
-	#echo "-p <name>	--profile <name>	Executes the task with the specified profile - the given name must be the same as the current working directory. "
+	echo "-p <name>	--profile <name>	Executes the task with the specified profile - the given name must be the same as the current working directory. "
 	echo ""
 	echo "-h 		--help 				This help page."
 }

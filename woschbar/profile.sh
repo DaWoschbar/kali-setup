@@ -15,38 +15,38 @@ function prep_shell_env()
 
 	echo -e "\e[93m[*] Changing shell to ZSH"
 	chsh -s /bin/zsh
-	cp -r $PROFILE_DIR.zshrc ~/.zshrc
+	cp -r $PROFILE_DIR/.zshrc ~/.zshrc
 }
 
 function remove_unwanted_dirs ()
 {
 	echo -e "\e[93m[!] Removing unnecessary folders..."
-	rmdir rmdir ~/Documents/ ~/Downloads/ ~/Music/ ~/Pictures/ ~/Public/ ~/Videos/ ~/Templates/ 2> /dev/null
+	rmdir ~/Documents/ ~/Downloads/ ~/Music/ ~/Pictures/ ~/Public/ ~/Videos/ ~/Templates/ 2> /dev/null
 }
 
 function enable_shared_folder ()
 {
-	echo -e "\e[93m[*] Creating sys links from shared folders..."
-	for i in "${ARRAY_FOLDER[@]}"
-	do
-		if [[ ! -d ~/$i ]]
-		then
-			echo "Creating $i"
-			ln -s /mnt/hgfs/Hacking/$i ~/$i
-		fi
-	done
 
-	cp $PROFILE_DIR/mount-shared-folders /root/Desktop
-	chmod +x /root/Destkop/mount-shared-folders
-
-	if [ -d /home/* ]; then
-		for dir in /home/*
-			cp $PROFILE_DIR/mount-shared-folders /home/$dir/Desktop/
-			chmod +x /home/$dir/Desktop/mount-shared-folders
+	if [[ -d /mnt/hgfs/Hacking ]]
+	then
+		echo -e "\e[93m[*] Creating sys links from shared folders..."
+		for i in "${ARRAY_FOLDER[@]}"
+		do
+			if [[ ! -d ~/$i ]]
+			then
+				echo "Creating $i"
+				ln -s /mnt/hgfs/Hacking/$i ~/$i
+			fi
 		done
-	fi
 
-	
+		cp $PROFILE_DIR/mount-shared-folders /root/Desktop
+		chmod +x /root/Destkop/mount-shared-folders
+
+		cp $PROFILE_DIR/mount-shared-folders /home/*/Desktop/
+		chmod +x /home/*/Desktop/mount-shared-folders
+	else 
+		echo -e "[!] Folders are not available! Check if they're activated..."
+	fi
 }
 
 remove_unwanted_dirs
