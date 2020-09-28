@@ -18,11 +18,17 @@ Essential mode which will brigthen your day. It fullfils all requirements as per
 ## Script Usage
 ``
 	-u 		    --update			Update git repos & apt packages.
+
 	-apt 		--apt-only			Install only apt packages. Apt update and upgrade included.
+
 	-m 		    --misc-only			Execute misc tasks like removing home folders.
+
 	-a 	    	--full-install		Run the whole installation part script. Recommended after clean installs.
+
 	-p <name>	--profile <name>	Executes the task with the specified profile - the given name must be the same as the current working directory. 
+
 	-h 		    --help 				This help page.
+    
 	--owo							OwO Mode :3
 ``
 
