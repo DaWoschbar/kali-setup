@@ -292,7 +292,7 @@ function usage ()
 	echo "-h 		--help 				This help page."
 	echo "--owo							OwO Mode :3"
 
-	echo -e "\n What are these arguments? (╯°□°）╯︵ ┻━┻"
+	owo "\n What are these arguments? (╯°□°）╯︵ ┻━┻"
 }
 
 function full_install ()
