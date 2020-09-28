@@ -32,7 +32,7 @@ Essential mode which will brigthen your day. It fulfills all requirements as per
 	--owo							OwO Mode :3
 ``
 
-#ToDo
+# ToDo
 - [ ] Batch mode - the script will auto-answer the questions
 - [ ] Code Refactoring
 - [x] Implementing profiles
