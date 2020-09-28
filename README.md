@@ -16,7 +16,6 @@ The `profile.sh` script will will be called from the installation script.
 Essential mode which will brigthen your day. It fulfills all requirements as per the geneva conventions. 
 
 ## Script Usage
-``
 	-u 		    --update			Update git repos & apt packages.
 
 	-apt 		--apt-only			Install only apt packages. Apt update and upgrade included.
@@ -30,7 +29,7 @@ Essential mode which will brigthen your day. It fulfills all requirements as per
 	-h 		    --help 				This help page.
 
 	--owo							OwO Mode :3
-``
+
 
 # ToDo
 - [ ] Batch mode - the script will auto-answer the questions
