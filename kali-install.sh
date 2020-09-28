@@ -45,16 +45,65 @@ nikto
 neo4j
 open-vm-tools
 gem
+golang
 )
+
+#globals
+_OWO=0
+_LOG=1
 
 #Color Legend:
 # Red = Cannot/Won't do it							\e[91
 # Yellow = Info (ex. something already exists)		\e[93m
 # Green = done										\e[92m
 
+function log ()
+{
+	if [[ $_LOG ]]; then
+		echo -e "\e[93m[*] $@"
+	fi
+}
+
+function log_info ()
+{
+	if [[ $_LOG ]]; then
+		echo -e "\e[93m[!] $@"
+	fi
+}
+
+function log_error ()
+{
+	echo -e "\e[91m[!] $@"
+}
+
+#Echo-ing owo lines if the --owo parameter was set
+function owo () 
+{
+    if [[ $_OWO -eq 1 ]]; then
+        echo "$@"
+    fi
+}
+
+#Essential starting function for the owo mode
+function start_owo ()
+{
+	echo -en "( •_•)" "\r"
+	sleep 1
+	echo -en "( •_•)>⌐■-■" "\r"
+	sleep 1 
+	echo "(⌐■_■)        " 
+	sleep 1
+
+	echo "[*] OwO Mode activated!"
+	sleep 1
+	echo "Let's go (つ▀¯▀)つ" 
+}
+
+#Downloading repositories that are in the ARRAY_GIT variable
+#Additionally executes the setup.py script when the scripts are written in python
 function prep_repos()
 {
-	echo -e "\e[93mInstalling git repos..."
+	log_info "Installing git repos..."
 
 	read -r -p "[?] Should the existing repos in /opt/ updated before the install? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
@@ -69,9 +118,9 @@ function prep_repos()
 
 		if [[ -d "/opt/$repo_name" ]]
 		then
-			echo -e " => \e[93m[!] $repo_name already exists in /opt/ - skipping..."
+			echo " => $repo_name already exists in /opt/ - skipping..."
 		else
-			echo -e " => \e[32mInstalling ${repo_name}"
+			log " => Installing ${repo_name}"
 			git clone -q $i /opt/$repo_name
 		fi
 	done
@@ -83,9 +132,9 @@ function prep_repos()
 
 		if [[ -d "/opt/$repo_name" ]]
 		then
-			echo -e " => \e[93m[!] $repo_name already exists in /opt/ - skipping..."
+			log_error "$repo_name already exists in /opt/ - skipping..."
 		else
-			echo -e " => \e[32mInstalling ${repo_name}"
+			echo " => Installing ${repo_name}"
 			git clone -q $i /opt/$repo_name 
 			pip3 install -r /opt/$repo_name/requirements.txt > /dev/null
 			python3 /opt/$repo_name/setup.py install > /dev/null
@@ -95,65 +144,70 @@ function prep_repos()
 	echo -e "\e[92m[*] Finished Github Repository download!"
 }
 
+#Update all repositories that are in ARRAY_GIT and GIT_PYTHON
 function update_repos()
 {
-	echo -e "Updating git repos..."
+	log "Updating git repos..."
 	
 	for d in /opt/*
 	do	
 		cd $d;
 		if [[ -d $d/.git ]]
 		then
-			echo -e "\e[93m => Updating $d"; git stash --quiet; (git pull --quiet &); cd ..;
+			echo " => Updating $d"; git stash --quiet; (git pull --quiet &); cd ..;
 		fi
 	done
-	echo -e "\e[92m[*] Finished repo updates!"
+	log "Finished repo updates!"
 }
 
+#Update and install apt packages + upgrades
 function prep_apt()
 {
-	echo -e "\e[93mInstalling apt packages..."
+	log_info "Installing apt packages..."
+	log_info "Updating apt cache..."
 	apt-get update -y > /dev/null
 	for i in "${ARRAY_APT[@]}"; do
-		echo -e " => \e[93m Installing ${i}"
+		echo " => Installing ${i}"
 		apt-get install $i -y -qq >/dev/null
 	done
 
-	echo -e "\e[93m[*] Performing apt full-upgrade..."
+	log "Performing apt full-upgrade..."
 	apt-get full-upgrade -y -qq
-	echo -e "\e[93m[*] Performing apt autoremove..."
+	log "Performing apt autoremove..."
 	apt-get autoremove -y -qq
 
-	echo -e "\e[92m[*] Finished download apt packages!"
+	log "Finished download apt packages!"
 }
-
+#Update and auto-remove apt packages
 function update_apt()
 {
-	echo "Updating apt packages..."
+	log "Updating apt packages..."
 	apt-get update -qq -y
 
-	echo -e "\e[93m[!] Running apt autoremove..."
+	log_info "Running apt autoremove..."
 	apt-get autoremove -y -qq
 
-	echo -e "\e[92m[*] Finished apt update!"
+	log_info "Finished apt update!"
 }
 
+#Install ruby gem packages
 function prep_ruby()
 {
-	echo -e "\e[93mInstalling Ruby gem packages..."
+	log_info "Installing Ruby gem packages..."
 	
 	for i in "${ARRAY_RUBY[@]}"
 	do
 		basename=$(basename $i)
 		repo_name=${basename%.*}
 
-		echo -e " => \e[93mInstalling ${repo_name}"
+		echo " => Installing ${repo_name}"
 		gem install $basename --silent
 	done
 
-	echo -e "\e[92m[*] Sucessfully installed ruby packages!"
+	log_info "Sucessfully installed ruby packages!"
 }
 
+#update ruby gem packages
 function update_ruby()
 {
 	for i in "${ARRAY_RUBY[@]}"
@@ -161,15 +215,16 @@ function update_ruby()
 		basename=$(basename $i)
 		repo_name=${basename%.*}
 
-		echo -e " => \e[32m Updating ${repo_name}"
+		echo " => Updating ${repo_name}"
 		gem update $basename --silent
 	done
-	echo -e "\e[92m[*] Finished ruby updates!"
+	log "Finished ruby updates!"
 }
 
+#Perform unspecific 
 function do_misc()
 {
-	echo -e "\e[93m[*] Executing misc"
+	log "Executing misc"
 	read -r -p "[?] Should autologin be enabled? [y/N] " response
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
@@ -178,7 +233,7 @@ function do_misc()
 		sed -i "s/#  AutomaticLogin = user1/AutomaticLogin = root/" /etc/gdm3/daemon.conf
 	fi
 	
-	echo -e "\e[93m[!] Disable auto-suspend and redefine lockout rules ..."
+	log_info "Disable auto-suspend and redefine lockout rules ..."
 	systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 	 # disable session idle
     gsettings set org.gnome.desktop.session idle-delay 0
@@ -194,15 +249,17 @@ function do_misc()
     xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/critical-power-action -s 2 --create --type int
 
 	if [ ! -f /usr/share/wordlists/rockyou.txt ]; then
-		echo -e "\e[93m[!] Unpacking rockyou.txt"
+		log_info "Unpacking rockyou.txt"
 		gunzip /usr/share/wordlists/rockyou.txt.gz 2>/dev/null
 	else
-		echo -e "\e[93m[!] Rockyou.txt already exists unpacked - skipping!"
+		log_error "Rockyou.txt already exists unpacked - skipping!"
 	fi
 	
 
 }
 
+#Profile functions that setup additional stuff like your shell environment
+#Non-modular! It basically just calls the script in the profile directory.
 function install_profile()
 {
 	PROFILE_NAME=$1
@@ -210,56 +267,101 @@ function install_profile()
 	if [ -d $PROFILE_NAME ]; then
 		if [ -f $PROFILE_NAME/profile.sh ]; then
 
-			echo -e "\e[93m[*] Applying profile settings from $PROFILE_NAME"
+			log "Applying profile settings from $PROFILE_NAME"
 			$PROFILE_NAME/profile.sh $PROFILE_NAME
 		else
-			echo -e "\e[93m[!] Error: Missing profile.sh in $PROFILE_NAME!"
+			log_error "Error: Missing profile.sh in $PROFILE_NAME!"
+			owo "No profile.sh in your directory (＠´＿｀＠)"
 		fi
 	else
-		echo -e "\e[93m[!] Error: the specified profilename does not match the directory!"
+		log_error "Error: the specified profilename does not match the directory!"
+		owo "(＠´＿｀＠)"
 		exit 1;
 	fi
 }
 
+#Print the available parameters
 function usage ()
 {
-	echo "-u 		--update	 		Update git repos & aptitude packages ."
-	echo "-s 		--shell-env	 		Only prep ZSH-Shell env"
-	echo "-apt 		--apt-only			Install only apt packages. Apt update included."
+	echo "-u 		--update			Update git repos & apt packages ."
+	echo "-apt 		--apt-only			Install only apt packages. Apt update and upgrade included."
 	echo "-m 		--misc-only			Execute misc tasks like removing home folders."
-	echo "-a 		--full-install		Run the whole script. Recommended by after clean installs."
+	echo "-a 		--full-install		Run the whole installation part script. Recommended after clean installs."
 	echo "-p <name>	--profile <name>	Executes the task with the specified profile - the given name must be the same as the current working directory. "
 	echo ""
 	echo "-h 		--help 				This help page."
+	echo "--owo							OwO Mode :3"
+
+	echo -e "\n What are these arguments? (╯°□°）╯︵ ┻━┻"
 }
 
 function full_install ()
 {
-	prep_apt
-	prep_repos
-	prep_ruby
-	do_misc
+	if [[ check_internet_connection ]]
+	then
+		owo "Going to install everything for you senpai (/◕ヮ◕)/"
+		prep_apt
+		owo "Going for the GitHub Repositories (≧∇≦)/"
+		prep_repos
+		owo "Going for Ruby stuff ヽ(⌐■_■)ノ♪♬"
+		prep_ruby
+		owo "Doing the rest (⌐■_■)"
+		do_misc
+	fi
 }
 
 function full_update ()
 {
-	update_repos 
-	update_apt 
-	update_ruby
+	if [[ check_internet_connection ]]
+		then
+		owo "Doing some updates(⌐■_■)"
+		owo "This might take some time Ｏ(≧▽≦)Ｏ"
+		update_repos 
+		update_apt 
+		update_ruby
+		owo "Finsihed (ﾉ´ヮ´)ﾉ*:･ﾟ✧"
+	fi
+
+}
+
+function check_internet_connection ()
+{
+	if : >/dev/tcp/8.8.8.8/53; then
+		return true
+	else
+		log_error "No internet connection available!"
+		exit 1
+	fi
 }
 
 if [[ $# -eq 0 ]] ; then
-    echo 'No Arguments provided'
+    echo "No Arguments provided"
 	usage
-	echo ""
-    exit 0
+	
+	echo -e "\n Where are my arguments? (╯°□°）╯︵ ┻━┻"
+    exit 1
 fi
+
+
 
 echo "===== This script was written by DaWoschbar ====="
 echo "Find me on GitHub: https://github.com/DaWoschbar"
 echo -e "\e[96mPreparing your environment..."
 
-while [ $# -gt 0 ] #getopts "p:husgma" opt
+#This loop is required in order to check if the owo parameter is called in general - Otherwise the parameters are executed in the defined order
+#In the future this loop can also be used for a silent mode
+#If you know how to make this process more efficent, contact me
+for var in "$@"
+do
+	if [[ $var == "--owo" ]]
+	then
+		_OWO=1
+		start_owo
+	fi
+done
+
+#Check and execute provided parameter
+while [ $# -gt 0 ]
 do
     case $1 in
         -h | --help ) usage;;
@@ -276,18 +378,20 @@ do
 				else
 					echo "Profile name not specified or invalid name!"
 					echo "The profilename must match the folder in the current working directory!"
+					owo "ಗಾ ﹏ ಗಾ"
 				fi
 			shift;;
-
-		-a | --full-install ) full_install;;
-
-        * ) echo -e "\e[0mInvalid arguments!\n\nUsage:"; usage
+		-a | --full-install ) full_install ;;
+		--owo ) ;;
+        * ) log_error "Invalid arguments!\n\nUsage:"; usage
 		exit 1;;
     esac
     shift
 done
 
 
-echo -e "\e[91m[!] Installation finished!"
-echo -e "\e[91m[!] Depending on the dependenciese and packages, your pc might need a reboot."
-echo -e "\e[91m[!] Keep in mind that some tools require manual installation!"
+owo "(✿◠‿◠) Finished your installation (✿◠‿◠)"
+log_error "Installation finished!"
+log_error "You might need to reboot your machine."
+log_error "Keep in mind that some tools require manual installation!"
+owo "Σ(ノ°▽°)ノ BYE!"
