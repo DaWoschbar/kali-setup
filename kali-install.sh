@@ -35,7 +35,6 @@ hexedit
 tmux
 python
 python3
-python-pip
 python3-pip
 xclip
 crackmapexec
@@ -51,6 +50,7 @@ golang
 #globals
 _OWO=0
 _LOG=1
+_BATCH=0
 
 #Color Legend:
 # Red = Cannot/Won't do it							\e[91
@@ -100,12 +100,18 @@ function start_owo ()
 }
 
 #Downloading repositories that are in the ARRAY_GIT variable
-#Additionally executes the setup.py script when the scripts are written in python
+#Additionally executes the setup.py script when the scripts are written in python3
 function prep_repos()
 {
 	log_info "Installing git repos..."
 
-	read -r -p "[?] Should the existing repos in /opt/ updated before the install? [y/N] " response
+	if [[ $_BATCH ]]
+	then
+		response="n"
+	else
+		read -r -p "[?] Should the existing repos in /opt/ updated before the install? [y/N] " response
+	fi
+	
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
 		update_repos
@@ -225,10 +231,17 @@ function update_ruby()
 function do_misc()
 {
 	log "Executing misc"
-	read -r -p "[?] Should autologin be enabled? [y/N] " response
+
+	if [[ $_BATCH ]]
+	then
+		response="n"
+	else
+		read -r -p "[?] Should autologin be enabled? [y/N] " response
+	fi 
+
 	if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 	then
-	#I was told this part can be done using sed, but I just don't know how
+	#I was told this part can be done using sed, but I just don't know how to do it properly with the current logged in user
 		sed -i "s/#  TimedLoginEnable = true/TimedLoginEnable = true/" /etc/gdm3/daemon.conf
 		sed -i "s/#  AutomaticLogin = user1/AutomaticLogin = root/" /etc/gdm3/daemon.conf
 	fi
@@ -288,6 +301,7 @@ function usage ()
 	echo "-m 		--misc-only			Execute misc tasks like removing home folders."
 	echo "-a 		--full-install		Run the whole installation part script. Recommended after clean installs."
 	echo "-p <name>	--profile <name>	Executes the task with the specified profile - the given name must be the same as the current working directory. "
+	echo "-y 		--batch				Autonomous mode - auto-answers every interactive question with no."
 	echo ""
 	echo "-h 		--help 				This help page."
 	echo "--owo							OwO Mode :3"
@@ -330,6 +344,8 @@ function check_internet_connection ()
 		return true
 	else
 		log_error "No internet connection available!"
+		owo "Check your internetz ಠ╭╮ಠ"
+		owo "Can't do something (⌯˃̶᷄ ﹏ ˂̶᷄⌯)"
 		exit 1
 	fi
 }
@@ -358,6 +374,10 @@ do
 		_OWO=1
 		start_owo
 	fi
+	if [[ $var == "--batch" || $var == "-y" ]]
+	then
+		_BATCH=1
+	fi
 done
 
 #Check and execute provided parameter
@@ -383,6 +403,7 @@ do
 			shift;;
 		-a | --full-install ) full_install ;;
 		--owo ) ;;
+		-y | --batch ) ;;
         * ) log_error "Invalid arguments!\n\nUsage:"; usage
 		exit 1;;
     esac
@@ -393,5 +414,5 @@ done
 owo "(✿◠‿◠) Finished your installation (✿◠‿◠)"
 log_error "Installation finished!"
 log_error "You might need to reboot your machine."
-log_error "Keep in mind that some tools require manual installation!"
+log_error "Keep in mind that some tools still require a manual installation!"
 owo "Σ(ノ°▽°)ノ BYE!"
