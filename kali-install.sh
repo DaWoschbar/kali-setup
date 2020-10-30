@@ -261,6 +261,15 @@ function do_misc()
     # hibernate when power is critical
     xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/critical-power-action -s 2 --create --type int
 
+	log_info "Disable system bell sound ..."
+	echo "set bell-style none" > ~/.inputrc
+	echo "set prefer-visible-bell on" >> ~/.inputrc
+	echo "set visualbell" > ~/.vimrc
+	modprobe -r pcspkr
+	echo "blacklist pcspkr" > /etc/modprobe.d/blacklist
+
+
+
 	if [ ! -f /usr/share/wordlists/rockyou.txt ]; then
 		log_info "Unpacking rockyou.txt"
 		gunzip /usr/share/wordlists/rockyou.txt.gz 2>/dev/null
