@@ -25,21 +25,21 @@ The `profile.sh` script will be called from the installation script.
 Essential mode which will brigthen your day. It fulfills all requirements as per the geneva conventions. 
 
 ## Script Usage
-	-u 		    --update			Update git repos & apt packages.
+	-u 		--update		Update git repos & apt packages.
 
-	-apt 		--apt-only			Install only apt packages. Apt update and upgrade included.
+	-apt 		--apt-only		Install only apt packages. Apt update and upgrade included.
 
-	-m 		    --misc-only			Execute misc tasks like removing home folders.
+	-m 		--misc-only		Execute misc tasks like removing home folders.
 
 	-a 	    	--full-install		Run the whole installation part script. Recommended after clean installs.
 
 	-p <name>	--profile <name>	Executes the task with the specified profile - the given name must be the same as the current working directory. 
 
-	-y 			--batch				Autonomous mode - auto-answers every interactive question with no.
+	-y 		--batch			Autonomous mode - auto-answers every interactive question with no.
 
-	-h 		    --help 				This help page.
+	-h 		--help 			This help page.
 
-	--owo							OwO Mode :3
+	--owo					OwO Mode :3
 
 
 # ToDo
