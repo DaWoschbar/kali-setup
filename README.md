@@ -6,20 +6,20 @@ Feel free to open any issues and feature requests as well as improvements.
 Feedback is appreciated!
 
 # Latest implementations & Improvements
-The script has been improved and now supports two essential features, which will enrich your life by a lot:
+The script has been improved and now supports even more essential features, which will enrich your life by a lot:
 
 ## Batch mode
-You now can go entirely afk during the installation process, just use the `-y` or `--batch` flag, all questions will then be answered with no.
+You now can go entirely afk during the installation process, just use the `-y` or `--batch` flag, all questions will then be skipped and not executed.
 
 ## Disable system bell
-By default the script will also disable the annoying system bell clock. Even though it will be disabled using bash variables as well as with a blacklist, depending on your window manager, you might still encounter the beeping sound! Currently I don't know of any other way to implement this on all Linux systems.
+By default the script will also disable the annoying system bell clock. Even though it will be disabled using bash variables as well as with a blacklist, depending on your window manager, you might still encounter the beeping sound! Currently I don't know if there are other universal solutions available.
 
 ## Profile mode
 In order to make this script more versatile, I decided to take out some parts of the code and put them into an external file allow to use profiles. This way every person is able to import their own shell environment as well as to perform their own tasks individually. 
 
 Profiles can be executed via the `-p` or `--profile` flag and require the foldername as parameter. The provided folder must contain the `profile.sh` script in order to run successfully.
 
-The `profile.sh` script will will be called from the installation script.
+The `profile.sh` script will be called from the installation script.
 
 ## OwO mode
 Essential mode which will brigthen your day. It fulfills all requirements as per the geneva conventions. 
